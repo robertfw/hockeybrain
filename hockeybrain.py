@@ -66,6 +66,12 @@ def parse_game_events(events):
                           for event in events if event['type'] in parsers]:
         event['meta'] = parser(event['description'])
 
+    for event in events:
+        if event['type'] in parsers:
+            event['meta'] = parsers[event['type']](event['description'])
+        else:
+            logging.warning('Parser not found for event: [{0}]'.format(event['type']))
+
     return events
 
 

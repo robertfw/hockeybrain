@@ -15,7 +15,6 @@ config = {
 }
 
 
-# http://www.nhl.com/ice/gamestats.htm?season=20122013&gameType=2&team=&viewName=teamRTSSreports
 def get_games(from_date=None, to_date=None):
     '''Returns a list of game ids'''
     pass
@@ -37,24 +36,25 @@ def retrieve_play_by_play_report(game_id):
     return response.content
 
 
+def convert_raw_row_to_event(cells):
+    return {
+        'id': cells[0].text,
+        'period': cells[1].text,
+        'strength': cells[2].text,
+        'time': cells[3].contents[0],
+        'type': cells[4].text,
+        'description': cells[5].text
+    }
+
+
 def convert_raw_report_to_events(report):
     '''parses an html play by play report'''
     soup = bs4.BeautifulSoup(report)
 
-    events = []
-    for table in soup.find_all('table'):
-        for row in table.find_all('tr'):
-            if 'evenColor' in row.attrs.get('class', []):
-                cells = row.find_all('td')
-                #import pdb; pdb.set_trace()
-                events.append({'id': cells[0].text,
-                               'period': cells[1].text,
-                               'strength': cells[2].text,
-                               'time': cells[3].contents[0],
-                               'type': cells[4].text,
-                               'description': cells[5].text})
-
-    return events
+    return [convert_raw_row_to_event(row.find_all('td'))
+            for table in soup.find_all('table')
+            for row in table.find_all('tr')
+            if 'evenColor' in row.attrs.get('class', [])]
 
 
 def format_player_number(number):

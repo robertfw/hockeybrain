@@ -43,3 +43,55 @@ def HIT(desc):
         'hittee_name': bits[6],
         'location': bits[7][:-1]
     }
+
+
+def PENL(desc):
+    bits = desc.split(' ')
+    return bits
+
+
+def TAKE(desc):
+    bits = desc.split(' ')
+    return bits
+
+
+def SHOT(desc):
+    bits = desc.split(' ')
+    return bits
+
+
+def BLOCK(desc):
+    bits = desc.split(' ')
+    return bits
+
+
+def PEND(desc):
+    return {
+        'time': desc.split(' ')[4]
+    }
+
+
+def GOAL(desc):
+    bits = desc.split(' ')
+    return bits
+
+
+def GIVE(desc):
+    bits = desc.split(' ')
+    return bits
+
+
+def GEND(desc):
+    return {
+        'time': desc.split(' ')[4]
+    }
+
+
+def STOP(desc):
+    bits = desc.split(' ')
+    return bits
+
+
+def PSTR(desc):
+    bits = desc.split(' ')
+    return bits

@@ -1,7 +1,5 @@
 import os
 import logging
-from collections import defaultdict
-from pprint import pprint
 
 import bs4
 import requests
@@ -38,7 +36,7 @@ def retrieve_play_by_play_report(game_id):
     return response.content
 
 
-def convert_raw_row_to_event(cells):
+def convert_row_to_event(cells):
     return {
         'id': cells[0].text,
         'period': cells[1].text,
@@ -49,11 +47,11 @@ def convert_raw_row_to_event(cells):
     }
 
 
-def convert_raw_report_to_events(report):
+def convert_report_to_events(report):
     '''parses an html play by play report'''
     soup = bs4.BeautifulSoup(report)
 
-    return [convert_raw_row_to_event(row.find_all('td'))
+    return [convert_row_to_event(row.find_all('td'))
             for table in soup.find_all('table')
             for row in table.find_all('tr')
             if 'evenColor' in row.attrs.get('class', [])]
@@ -69,14 +67,6 @@ def parse_game_events(events):
         event['meta'] = parser(event['description'])
 
     return events
-
-
-def sort_into_periods(events):
-    periods = defaultdict(list)
-    for event in events:
-        periods[event['period']].append(event)
-
-    return periods
 
 
 def get_play_by_play_report(game_id):
@@ -116,7 +106,7 @@ def thread(functions, *args, **kwargs):
 
 
 game = thread([get_play_by_play_report,
-               convert_raw_report_to_events,
+               convert_report_to_events,
                parse_game_events],
               563)
 

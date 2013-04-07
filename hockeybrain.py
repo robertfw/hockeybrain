@@ -6,6 +6,8 @@ from pprint import pprint
 import bs4
 import requests
 
+import event_parsers
+
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger()
 
@@ -57,62 +59,14 @@ def convert_raw_report_to_events(report):
             if 'evenColor' in row.attrs.get('class', [])]
 
 
-def format_player_number(number):
-    return number.replace('#', '')
-
-
-def parse_miss(desc):
-    bits = desc.split(',')
-
-    team, number, player = bits[0].split(' ')
-
-    return {
-        'team': team,
-        'number': number,
-        'player': player,
-        'shot_type': bits[1].strip(),
-        'where': bits[2].strip(),
-        'zone': bits[3].strip(),
-        'distance': bits[4].strip()
-    }
-
-
-def parse_faceoff(desc):
-    bits = desc.split(' ')
-    return {
-        'location': bits[2][:-1],
-        'player_1_team': bits[5],
-        'player_1_number': format_player_number(bits[6]),
-        'player_1_name': bits[7],
-        'player_2_team': bits[9],
-        'player_2_number': format_player_number(bits[10]),
-        'player_2_name': bits[11],
-    }
-
-
-def parse_hit(desc):
-    bits = desc.split(' ')
-
-    return {
-        'hitter_team': bits[0],
-        'hitter_number': format_player_number(bits[1]),
-        'hitter_name': bits[2],
-        'hittee_team': bits[4],
-        'hittee_number': format_player_number(bits[5]),
-        'hittee_name': bits[6],
-        'location': bits[7][:-1]
-    }
-
-
 def parse_game_events(events):
-    types = {
-        'MISS': parse_miss,
-        'FAC': parse_faceoff,
-        'HIT': parse_hit
-    }
+    parsers = {func: getattr(event_parsers, func)
+               for func in dir(event_parsers)
+               if func[0] != '_'}
 
-    for event in [event for event in events if event['type'] in types]:
-        event['meta'] = types[event['type']](event['description'])
+    for event, parser in [(event, parsers[event['type']])
+                          for event in events if event['type'] in parsers]:
+        event['meta'] = parser(event['description'])
 
     return events
 

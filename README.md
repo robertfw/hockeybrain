@@ -1,16 +1,14 @@
 # Hockey Brain
 
-The system consists of the following pieces
+The hockey brain is made up of the following parts
 
-## NHL Event Log Importer
+## Event Log Importer
 
-Uses beautiful soup to parse html
-Use a parsing language to convert to python data structure?
-Persistent storage? SQL? Graph? PostgreSQL? Titan? PostgreSQL w/ node-graph structure?
+Imports statistics from NHL event logs. Uses BeautifulSoup for initial parsing
 
+## Data Persistance Layer
 
-
-## NHL Event Log Query DSL
+## Event Query DSL
 
 A DSL for querying NHL games in hockey terms.
 
@@ -28,7 +26,7 @@ and retrieving any related statistics
 ## Web interface
 
 A web interface for all systems
-- User creation
+- User creations
 - Users teams
 - Statistics query system
 - Prebuilt statistics queries and views (team, pool team, line, etc)

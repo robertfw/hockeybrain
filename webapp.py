@@ -12,15 +12,14 @@ if settings.DEBUG:
     bottle.debug(True)
 
 
-@app.route('/')
-def index():
-    return 'omg'
+@app.route('/static/<filepath:path>')
+def static(filepath):
+    return bottle.static_file(filepath, settings.STATIC_PATH)
 
 
-@app.route('/game/<game_id>')
+@app.route('/api/game/<game_id>')
 def game(game_id):
-    return bottle.Response(hockeybrain.get_game(int(game_id)))
-
+    return {'events': hockeybrain.get_events_for_game(int(game_id))}
 
 if __name__ == '__main__':
     kwargs = {
@@ -30,8 +29,5 @@ if __name__ == '__main__':
 
     if settings.DEBUG:
         kwargs['reloader'] = True
-        func = bottle.debug
-    else:
-        func = bottle.run
 
     app.run(**kwargs)

@@ -127,7 +127,8 @@ def get_play_by_play_report_for_game_id(game_id):
         return report
 
 
-def get_game(game_id):
+def get_events_for_game(game_id):
+    #TODO: cache generated data
     return utils.thread(
         [get_play_by_play_report_for_game_id,
          get_events_from_report,

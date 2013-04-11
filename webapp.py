@@ -17,9 +17,9 @@ def static(filepath):
     return bottle.static_file(filepath, settings.STATIC_PATH)
 
 
-@app.route('/api/game/<game_id>')
+@app.route('/api/game/<game_id:int>')
 def game(game_id):
-    return {'events': hockeybrain.get_events_for_game(int(game_id))}
+    return {'events': hockeybrain.get_events_for_game(game_id)}
 
 if __name__ == '__main__':
     kwargs = {

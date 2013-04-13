@@ -31,11 +31,11 @@ def get_players_on_from_cell(cell):
     on_ice = []
     for player in cell.find_all('font'):
         position, player_name = player.attrs['title'].split(' - ')
-        on_ice.append({
-            'number': player.text,
-            'position': position,
-            'name': player_name
-        })
+        on_ice.append(event_parsers.Player(
+            player_name,
+            player.text,
+            position=position
+        ))
 
     return on_ice
 
@@ -127,11 +127,36 @@ def get_play_by_play_report_for_game_id(game_id):
         return report
 
 
+def get_game_summary_from_events(events):
+    # summary = {
+    #     'home': None,
+    #     'visitor': None,
+    #     'home_score': 0,
+    #     'visitor_score': 0
+    # }
+
+    return events
+
+
 def get_events_for_game(game_id):
     #TODO: cache generated data
-    return utils.thread(
+    events = utils.thread(
         [get_play_by_play_report_for_game_id,
          get_events_from_report,
          add_meta_to_events],
         game_id
     )
+
+    return {
+        'summary': get_game_summary_from_events(events),
+        'events': events
+    }
+
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG)
+    game = get_events_for_game(563)
+    events = game['events']
+    fos = [e['meta'] for e in events if e['type'] == 'FAC']
+
+    import pdb
+    pdb.set_trace()

@@ -14,3 +14,8 @@ def thread(functions, *args, **kwargs):
         result = function(result)
 
     return result
+
+
+def split_list_around_value(alist, splitter):
+    split_index = alist.index(splitter)
+    return (alist[:split_index], alist[split_index + 1:])

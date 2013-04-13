@@ -7,6 +7,7 @@ import requests
 import event_parsers
 import utils
 import config
+import entities
 
 logger = logging.getLogger()
 
@@ -31,9 +32,9 @@ def get_players_on_from_cell(cell):
     on_ice = []
     for player in cell.find_all('font'):
         position, player_name = player.attrs['title'].split(' - ')
-        on_ice.append(event_parsers.Player(
-            player_name,
-            player.text,
+        on_ice.append(entities.Player(
+            name=player_name,
+            number=player.text,
             position=position
         ))
 

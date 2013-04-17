@@ -65,22 +65,6 @@ def get_events_from_report(report):
             if 'evenColor' in row.attrs.get('class', [])]
 
 
-def safely_run_parser(parser, description):
-    try:
-        result = parser(description)
-    except (IndexError, ValueError) as exc:
-        logging.error(
-            'Caught parser exception for description [{0}]'.format(
-                description
-            ),
-            exc_info=True
-        )
-
-        result = exc
-
-    return result
-
-
 def add_meta_to_events(events):
     # builds a dictionary of functions in the event_parsers module
     # ignoring anything starting with an underscore
@@ -92,10 +76,19 @@ def add_meta_to_events(events):
 
     for event in events:
         if event['type'] in parsers:
-            event['meta'] = safely_run_parser(
-                parsers[event['type']],
-                event['description']
-            )
+            try:
+                meta = parsers[event['type']](event['description'])
+            except (IndexError, ValueError) as exc:
+                logging.error(
+                    'Caught parser exception for description [{0}]'.format(
+                        event['description']
+                    ),
+                    exc_info=True
+                )
+
+                meta = exc
+
+            event['meta'] = meta
         else:
             logging.warning('[{0}] has no event parser'.format(event['type']))
 

@@ -1,44 +1,13 @@
-import os
 import logging
+import os
 
-import bs4
 import requests
+import bs4
 
-import event_parsers
 import utils
 import config
 import entities
-
-logger = logging.getLogger()
-
-
-def download_play_by_play_report_for_game_id(game_id):
-    '''Gets stats for a given game id'''
-    assert type(game_id) is int, "game_id must be an int"
-    # TODO: check to see what game ids go up to
-    assert game_id < 10000, "game id must be < 10000"
-
-    url = config.PLAY_BY_PLAY_URL.format(game_id=game_id)
-    logger.info('retrieving play by play from {url}'.format(url=url))
-    response = requests.get(url)
-
-    if response.status_code != 200:
-        raise Exception('Error retrieving game report')
-
-    return response.content
-
-
-def get_players_on_from_cell(cell):
-    on_ice = []
-    for player in cell.find_all('font'):
-        position, player_name = player.attrs['title'].split(' - ')
-        on_ice.append(entities.Player(
-            name=player_name,
-            number=player.text,
-            position=position
-        ))
-
-    return on_ice
+import nhl_event_parsers
 
 
 def get_event_from_row(row):
@@ -70,8 +39,8 @@ def add_meta_to_events(events):
     # ignoring anything starting with an underscore
     # TODO: along with the corresponding note in event_parsers,
     # this approach seems a bit magical
-    parsers = {func: getattr(event_parsers, func)
-               for func in dir(event_parsers)
+    parsers = {func: getattr(nhl_event_parsers, func)
+               for func in dir(nhl_event_parsers)
                if func[0] != '_'}
 
     for event in events:
@@ -122,17 +91,17 @@ def get_play_by_play_report_for_game_id(game_id):
 
 
 def get_game_summary_from_events(events):
-    # summary = {
-    #     'home': None,
-    #     'visitor': None,
-    #     'home_score': 0,
-    #     'visitor_score': 0
-    # }
+    summary = {
+         'home': None,
+         'visitor': None,
+         'home_score': 0,
+         'visitor_score': 0
+    }
 
-    return events
+    return summary
 
 
-def get_events_for_game(game_id):
+def get_game(game_id):
     #TODO: cache generated data
     events = utils.thread(
         [get_play_by_play_report_for_game_id,
@@ -146,11 +115,34 @@ def get_events_for_game(game_id):
         'events': events
     }
 
-if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG)
-    game = get_events_for_game(563)
-    events = game['events']
-    fos = [e['meta'] for e in events if e['type'] == 'FAC']
 
-    import pdb
-    pdb.set_trace()
+logger = logging.getLogger(__name__)
+
+
+def download_play_by_play_report_for_game_id(game_id):
+    '''Gets stats for a given game id'''
+    assert type(game_id) is int, "game_id must be an int"
+    # TODO: check to see what game ids go up to
+    assert game_id < 10000, "game id must be < 10000"
+
+    url = config.PLAY_BY_PLAY_URL.format(game_id=game_id)
+    logger.info('retrieving play by play from {url}'.format(url=url))
+    response = requests.get(url)
+
+    if response.status_code != 200:
+        raise Exception('Error retrieving game report')
+
+    return response.content
+
+
+def get_players_on_from_cell(cell):
+    on_ice = []
+    for player in cell.find_all('font'):
+        position, player_name = player.attrs['title'].split(' - ')
+        on_ice.append(entities.Player(
+            name=player_name,
+            number=player.text,
+            position=position
+        ))
+
+    return on_ice

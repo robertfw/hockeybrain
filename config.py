@@ -2,8 +2,6 @@ import os
 
 DEBUG = True
 
-#TODO: automate these with a build tool or something
-BUILD = 1
 VERSION = '0.0.1'
 
 # general

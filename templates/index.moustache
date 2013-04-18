@@ -17,11 +17,6 @@
 
   <div class="row">
     <div class="large-12 columns">
-      <div class="nav-bar right">
-       <ul class="button-group">
-         <li><a href="#" class="button">{{ user.name }}</a></li>
-        </ul>
-      </div>
       <h1>hockeytron<small>alpha</small></h1>
       <hr />
     </div>
